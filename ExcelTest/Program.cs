@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
-using Excel = Microsoft.Office.Interop.Excel;       //microsoft Excel 14 object in references-> COM tab
+using Excel = Microsoft.Office.Interop.Excel;       
 
 namespace ExcelTest
 {
@@ -30,51 +32,86 @@ namespace ExcelTest
 
                 int rowCount = xlRange.Rows.Count;
                 int colCount = xlRange.Columns.Count;
-                string[,] TrainingDetails = new string[rowCount - 3, 2];
+                var strings = new List<Tuple<int, string, string, string>>();
 
-                //iterate over the rows and columns and print to the console as it appears in the file
-                //excel is not zero based!!
-                for (int i = 3; i <= rowCount; i++)
+            //iterate over the rows and columns and print to the console as it appears in the file
+            //excel is not zero based!!
+                for (int row = 3; row <= rowCount; row++)
                 {
-                    for (int j = 2; j <= 6; j++)
-                    {
-                        //new line
-                    if (j == 2)
-                    {
-                        if (xlRange.Cells[i, j] != null && xlRange.Cells[i, j].Value2 != null)
-                        {
-                            string value = xlRange.Cells[i, j].Value2.ToString();
-                            if (value.ToUpper() != value)
-                            {
-                                TrainingDetails[i - 3, j-2] = value;
-                                //Console.WriteLine(value + "\t");
-                            }
+                    string training = "";
+                    string instructor = "";
+                    string duration = "";
 
-                        }
-                    }
-                    if (j == 6)
+                    for (int column = 2; column <= 7; column++)
                     {
-                        if (xlRange.Cells[i, j] != null && xlRange.Cells[i, j].Value2 != null)
-                        {
-                            string value = xlRange.Cells[i, j].Value2.ToString();
-                            if (value.ToUpper() != value)
-                            {
-                                TrainingDetails[i - 3, j - 5] = value;
-                                //Console.WriteLine(value + "\t");
-                            }
-
-                        }
-                    }
                        
+                        if (column == 2)
+                        {
+                            if (xlRange.Cells[row, column] != null && xlRange.Cells[row, column].Value2 != null)
+                            {
+                                int index0 = row - 3; //since we read from the 3rd row and we want to count from 0
+                                int index1 = column - 2; //since we read from the 3rd column, and we want to count from 1
+
+                                string value = xlRange.Cells[row, column].Value2.ToString();
+                                if (value.ToUpper() != value)
+                                {
+                                    training = value;
+                                }
+                            
+
+                            }
+                        }
+                       
+                        if (column == 6)
+                        {
+
+                            if (xlRange.Cells[row, column] != null && xlRange.Cells[row, column].Value2 != null)
+                            {
+                                string value = xlRange.Cells[row, column].Value2.ToString();
+
+                                if (value.ToUpper() != value)
+                                {
+                                    instructor = value;
+                                }
+                            
+
+                            }
+                        }
+
+                    if (column == 7)
+                    {
+
+                        if (xlRange.Cells[row, column] != null && xlRange.Cells[row, column].Value2 != null)
+                        {
+                            string value = xlRange.Cells[row, column].Value2.ToString();
+
+                            if (value.ToUpper() != value)
+                            {
+                                duration = value;
+                            }
+
+
+                        }
                     }
                 }
-            for (int i =0; i<TrainingDetails.GetLength(0); i++)
-            {
-                for (int j=0; j<TrainingDetails.GetLength(1)-1; j++)
+
+                if (instructor != "" || training != "")
                 {
-                    Console.WriteLine($"Training = {TrainingDetails[i,j]} , Instructor = {TrainingDetails[i,j+1]}");
+                    if (instructor == "")
+                    {
+                        instructor = "None";
+                    }
+                    strings.Add(Tuple.Create(strings.Count() + 1, training, instructor, duration));
                 }
             }
+
+
+            foreach (var tuple in strings)
+            {
+                Console.Write($" {tuple.Item1}, {tuple.Item2}, {tuple.Item3}, {tuple.Item4}");
+                Console.WriteLine();
+            }
+
 
                 //cleanup
                 GC.Collect();
